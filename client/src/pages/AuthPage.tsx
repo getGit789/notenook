@@ -68,10 +68,17 @@ export default function AuthPage() {
               <Button
                 variant="outline"
                 onClick={() => window.location.href = "/api/auth/google"}
-                className="w-full flex items-center justify-center gap-2"
+                className="w-full flex items-center justify-center gap-2 bg-white text-gray-600 hover:bg-gray-50 border-gray-300"
               >
-                <SiGoogle className="h-4 w-4" />
-                Continue with Google
+                <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                  <g fill="none" fillRule="evenodd">
+                    <path d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8c-.2 1.1-.8 2-1.7 2.6v2.2h2.8c1.6-1.5 2.7-3.8 2.7-6.4z" fill="#4285F4"/>
+                    <path d="M9 18c2.3 0 4.3-.8 5.7-2.1l-2.8-2.2c-.8.5-1.8.9-2.9.9-2.2 0-4.1-1.5-4.8-3.5H1.4v2.3C2.8 15.9 5.7 18 9 18z" fill="#34A853"/>
+                    <path d="M4.2 11.1c-.2-.5-.3-1-.3-1.6 0-.6.1-1.1.3-1.6V5.6H1.4C.5 7 0 8.4 0 10c0 1.6.5 3 1.4 4.4l2.8-3.3z" fill="#FBBC05"/>
+                    <path d="M9 3.9c1.2 0 2.3.4 3.2 1.3L14.9 2.5C13.5 1 11.4 0 9 0 5.7 0 2.8 2.1 1.4 4.6l2.8 2.3C4.9 5.4 6.8 3.9 9 3.9z" fill="#EA4335"/>
+                  </g>
+                </svg>
+                <span className="ml-2 font-medium">Continue with Google</span>
               </Button>
               <Button
                 variant="outline"
