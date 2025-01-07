@@ -1,5 +1,7 @@
 import passport from "passport";
 import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as GitHubStrategy } from "passport-github2";
 import { type Express } from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -57,6 +59,7 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Local Strategy
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
@@ -80,6 +83,80 @@ export function setupAuth(app: Express) {
     })
   );
 
+  // Google Strategy (placeholder configuration)
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callbackURL: "/api/auth/google/callback",
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            let [user] = await db
+              .select()
+              .from(users)
+              .where(eq(users.username, profile.emails![0].value))
+              .limit(1);
+
+            if (!user) {
+              const [newUser] = await db
+                .insert(users)
+                .values({
+                  username: profile.emails![0].value,
+                  password: await crypto.hash(randomBytes(32).toString("hex")),
+                })
+                .returning();
+              user = newUser;
+            }
+
+            return done(null, user);
+          } catch (err) {
+            return done(err as Error);
+          }
+        }
+      )
+    );
+  }
+
+  // GitHub Strategy (placeholder configuration)
+  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    passport.use(
+      new GitHubStrategy(
+        {
+          clientID: process.env.GITHUB_CLIENT_ID,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          callbackURL: "/api/auth/github/callback",
+        },
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            let [user] = await db
+              .select()
+              .from(users)
+              .where(eq(users.username, profile.username!))
+              .limit(1);
+
+            if (!user) {
+              const [newUser] = await db
+                .insert(users)
+                .values({
+                  username: profile.username!,
+                  password: await crypto.hash(randomBytes(32).toString("hex")),
+                })
+                .returning();
+              user = newUser;
+            }
+
+            return done(null, user);
+          } catch (err) {
+            return done(err as Error);
+          }
+        }
+      )
+    );
+  }
+
   passport.serializeUser((user, done) => {
     done(null, user.id);
   });
@@ -97,6 +174,23 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // OAuth routes
+  app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+  app.get("/api/auth/github", passport.authenticate("github"));
+
+  app.get(
+    "/api/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/" }),
+    (req, res) => res.redirect("/")
+  );
+
+  app.get(
+    "/api/auth/github/callback",
+    passport.authenticate("github", { failureRedirect: "/" }),
+    (req, res) => res.redirect("/")
+  );
+
+  // Local auth routes
   app.post("/api/register", async (req, res, next) => {
     try {
       const result = insertUserSchema.safeParse(req.body);

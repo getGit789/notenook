@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { SiGoogle, SiGithub } from "react-icons/si";
+import { Separator } from "@/components/ui/separator";
 
 type FormData = {
   username: string;
@@ -61,47 +63,79 @@ export default function AuthPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="Enter password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-                {isLogin ? "Login" : "Register"}
+          <div className="space-y-4">
+            <div className="grid gap-2">
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = "/api/auth/google"}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <SiGoogle className="h-4 w-4" />
+                Continue with Google
               </Button>
               <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setIsLogin(!isLogin)}
+                variant="outline"
+                onClick={() => window.location.href = "/api/auth/github"}
+                className="w-full flex items-center justify-center gap-2"
               >
-                {isLogin ? "Need an account? Register" : "Have an account? Login"}
+                <SiGithub className="h-4 w-4" />
+                Continue with GitHub
               </Button>
-            </form>
-          </Form>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter username" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Enter password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  {isLogin ? "Login" : "Register"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => setIsLogin(!isLogin)}
+                >
+                  {isLogin ? "Need an account? Register" : "Have an account? Login"}
+                </Button>
+              </form>
+            </Form>
+          </div>
         </CardContent>
       </Card>
     </div>
