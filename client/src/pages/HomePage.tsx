@@ -3,6 +3,7 @@ import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskStats } from "@/components/TaskStats";
 import { TaskFilters, filterAndGroupTasks } from "@/components/TaskFilters";
+import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
 import { SelectTask } from "@db/schema";
@@ -50,7 +51,14 @@ export default function HomePage() {
         </div>
       </div>
 
-      {tasks && <TaskStats tasks={tasks} />}
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-4">
+        <div className="lg:col-span-3">
+          {tasks && <TaskStats tasks={tasks} />}
+        </div>
+        <div>
+          <PomodoroTimer />
+        </div>
+      </div>
 
       <TaskFilters filters={filters} onFilterChange={setFilters} />
 
