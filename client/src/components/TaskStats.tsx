@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SelectTask } from "@db/schema";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { CheckCircle2, Clock, Target, TrendingUp, Calendar } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { CheckCircle2, Clock, Target } from "lucide-react";
 
 type TaskStatsProps = {
   tasks: SelectTask[];
@@ -13,10 +13,6 @@ export function TaskStats({ tasks }: TaskStatsProps) {
   const completedTasks = tasks.filter((task) => task.completed).length;
   const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  // Calculate tasks with deadlines
-  const tasksWithDeadlines = tasks.filter((task) => task.deadline).length;
-  const deadlineRate = totalTasks ? Math.round((tasksWithDeadlines / totalTasks) * 100) : 0;
-
   // Calculate priority distribution
   const priorityCount = tasks.reduce(
     (acc, task) => {
@@ -27,19 +23,18 @@ export function TaskStats({ tasks }: TaskStatsProps) {
   );
 
   const priorityData = Object.entries(priorityCount).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1),
+    name,
     value,
-    percentage: totalTasks ? Math.round((value / totalTasks) * 100) : 0,
   }));
 
   const COLORS = {
-    High: "#ef4444",
-    Medium: "#f59e0b",
-    Low: "#22c55e",
+    high: "#ef4444",
+    medium: "#f59e0b",
+    low: "#22c55e",
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
@@ -48,7 +43,7 @@ export function TaskStats({ tasks }: TaskStatsProps) {
         <CardContent>
           <div className="text-2xl font-bold">{totalTasks}</div>
           <p className="text-xs text-muted-foreground">
-            {completedTasks} completed, {totalTasks - completedTasks} remaining
+            {completedTasks} completed
           </p>
         </CardContent>
       </Card>
@@ -61,40 +56,12 @@ export function TaskStats({ tasks }: TaskStatsProps) {
         <CardContent>
           <div className="text-2xl font-bold">{completionRate}%</div>
           <p className="text-xs text-muted-foreground">
-            {completedTasks} out of {totalTasks} tasks completed
+            Of all tasks completed
           </p>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Task Planning</CardTitle>
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{deadlineRate}%</div>
-          <p className="text-xs text-muted-foreground">
-            {tasksWithDeadlines} tasks with deadlines set
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Productivity Score</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {Math.round((completionRate + deadlineRate) / 2)}%
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Based on completion and planning
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="md:col-span-2 lg:col-span-4">
+      <Card className="col-span-full md:col-span-2 lg:col-span-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Priority Distribution</CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -111,16 +78,14 @@ export function TaskStats({ tasks }: TaskStatsProps) {
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
-                  label={({name, percentage}) => `${name}: ${percentage}%`}
                 >
-                  {priorityData.map((entry) => (
+                  {priorityData.map((entry, index) => (
                     <Cell
-                      key={entry.name}
+                      key={`cell-${index}`}
                       fill={COLORS[entry.name as keyof typeof COLORS]}
                     />
                   ))}
                 </Pie>
-                <Tooltip />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
