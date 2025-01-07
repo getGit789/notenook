@@ -4,6 +4,7 @@ import { TaskCard } from "@/components/TaskCard";
 import { TaskStats } from "@/components/TaskStats";
 import { TaskFilters, filterAndGroupTasks } from "@/components/TaskFilters";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
 import { SelectTask } from "@db/schema";
@@ -43,7 +44,8 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold">Task Dashboard</h1>
           <p className="text-muted-foreground">Welcome back, {user?.username}</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
           <CreateTaskDialog />
           <Button variant="outline" onClick={handleLogout}>
             Logout
