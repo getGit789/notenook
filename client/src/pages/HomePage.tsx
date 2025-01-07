@@ -29,7 +29,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -38,54 +38,56 @@ export default function HomePage() {
   const taskGroups = tasks ? filterAndGroupTasks(tasks, filters) : [];
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Task Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {user?.username}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <CreateTaskDialog />
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid gap-8 grid-cols-1 lg:grid-cols-4">
-        <div className="lg:col-span-3">
-          {tasks && <TaskStats tasks={tasks} />}
-        </div>
-        <div>
-          <PomodoroTimer />
-        </div>
-      </div>
-
-      <TaskFilters filters={filters} onFilterChange={setFilters} />
-
-      <div className="space-y-8">
-        {taskGroups.map((group) => (
-          <div key={group.title}>
-            <h2 className="text-xl font-semibold mb-4">{group.title}</h2>
-            {group.tasks.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {group.tasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                No tasks in this group
-              </div>
-            )}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 space-y-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Task Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back, {user?.username}</p>
           </div>
-        ))}
-        {taskGroups.every((group) => group.tasks.length === 0) && (
-          <div className="text-center text-muted-foreground py-8">
-            No tasks match the selected filters
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <CreateTaskDialog />
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
-        )}
+        </div>
+
+        <div className="grid gap-8 grid-cols-1 lg:grid-cols-4">
+          <div className="lg:col-span-3">
+            {tasks && <TaskStats tasks={tasks} />}
+          </div>
+          <div>
+            <PomodoroTimer />
+          </div>
+        </div>
+
+        <TaskFilters filters={filters} onFilterChange={setFilters} />
+
+        <div className="space-y-8">
+          {taskGroups.map((group) => (
+            <div key={group.title}>
+              <h2 className="text-xl font-semibold mb-4">{group.title}</h2>
+              {group.tasks.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {group.tasks.map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8 bg-card rounded-lg">
+                  No tasks in this group
+                </div>
+              )}
+            </div>
+          ))}
+          {taskGroups.every((group) => group.tasks.length === 0) && (
+            <div className="text-center text-muted-foreground py-8 bg-card rounded-lg">
+              No tasks match the selected filters
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
