@@ -2,13 +2,20 @@ import { useQuery } from "@tanstack/react-query";
 import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskStats } from "@/components/TaskStats";
+import { TaskFilters, filterAndGroupTasks } from "@/components/TaskFilters";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
 import { SelectTask } from "@db/schema";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function HomePage() {
   const { user, logout } = useUser();
+  const [filters, setFilters] = useState({
+    priority: null,
+    showCompleted: true,
+    groupBy: null,
+  });
 
   const { data: tasks, isLoading } = useQuery<SelectTask[]>({
     queryKey: ["/api/tasks"],
@@ -25,6 +32,8 @@ export default function HomePage() {
       </div>
     );
   }
+
+  const taskGroups = tasks ? filterAndGroupTasks(tasks, filters) : [];
 
   return (
     <div className="container mx-auto p-4 space-y-8">
@@ -43,18 +52,30 @@ export default function HomePage() {
 
       {tasks && <TaskStats tasks={tasks} />}
 
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Your Tasks</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {tasks?.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
-          {tasks?.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground">
-              No tasks yet. Create your first task to get started!
-            </div>
-          )}
-        </div>
+      <TaskFilters filters={filters} onFilterChange={setFilters} />
+
+      <div className="space-y-8">
+        {taskGroups.map((group) => (
+          <div key={group.title}>
+            <h2 className="text-xl font-semibold mb-4">{group.title}</h2>
+            {group.tasks.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {group.tasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                No tasks in this group
+              </div>
+            )}
+          </div>
+        ))}
+        {taskGroups.every((group) => group.tasks.length === 0) && (
+          <div className="text-center text-muted-foreground py-8">
+            No tasks match the selected filters
+          </div>
+        )}
       </div>
     </div>
   );
