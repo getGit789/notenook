@@ -13,9 +13,15 @@ type TaskCardProps = {
 };
 
 const priorityColors = {
-  low: "bg-green-500",
-  medium: "bg-yellow-500",
-  high: "bg-red-500",
+  low: "bg-gradient-to-r from-green-400 to-green-500 text-white",
+  medium: "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white",
+  high: "bg-gradient-to-r from-red-400 to-red-500 text-white",
+};
+
+const priorityRings = {
+  low: "ring-green-400/30",
+  medium: "ring-yellow-400/30",
+  high: "ring-red-400/30",
 };
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -86,7 +92,9 @@ export function TaskCard({ task }: TaskCardProps) {
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className={task.completed ? "opacity-60" : ""}>
+      <Card 
+        className={`${task.completed ? "opacity-60" : ""} ring-1 ring-inset ${priorityRings[task.priority as keyof typeof priorityRings]} transition-shadow duration-200`}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             <div className="flex items-center gap-2">
@@ -117,7 +125,7 @@ export function TaskCard({ task }: TaskCardProps) {
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
             >
-              <Badge className={priorityColors[task.priority as keyof typeof priorityColors]}>
+              <Badge className={`${priorityColors[task.priority as keyof typeof priorityColors]} shadow-sm`}>
                 {task.priority}
               </Badge>
             </motion.div>
