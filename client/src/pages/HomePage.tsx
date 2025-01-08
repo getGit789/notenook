@@ -57,8 +57,8 @@ export default function HomePage() {
           className="flex justify-between items-center"
         >
           <div>
-            <h1 className="text-3xl font-bold">Task Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {user?.username}</p>
+            <h1 className="text-2xl font-medium mb-1">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Welcome, {user?.username?.split('@')[0]}</p>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
