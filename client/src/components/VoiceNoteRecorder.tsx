@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, Square, Play, Pause } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -14,11 +14,30 @@ export function VoiceNoteRecorder({ onRecordingComplete, currentVoiceNote }: Voi
   const [isPlaying, setIsPlaying] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const { toast } = useToast();
-  
+
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
   const timerInterval = useRef<NodeJS.Timeout>();
+
+  // Initialize audio player
+  useEffect(() => {
+    if (currentVoiceNote && !audioPlayer.current) {
+      const audio = new Audio();
+      audio.src = currentVoiceNote;
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load voice note. Please try again.",
+        });
+        setIsPlaying(false);
+      };
+      audioPlayer.current = audio;
+    }
+  }, [currentVoiceNote, toast]);
 
   const startRecording = async () => {
     try {
@@ -38,7 +57,7 @@ export function VoiceNoteRecorder({ onRecordingComplete, currentVoiceNote }: Voi
       mediaRecorder.current.start();
       setIsRecording(true);
       setRecordingTime(0);
-      
+
       timerInterval.current = setInterval(() => {
         setRecordingTime(time => time + 1);
       }, 1000);
@@ -62,19 +81,40 @@ export function VoiceNoteRecorder({ onRecordingComplete, currentVoiceNote }: Voi
   };
 
   const togglePlayback = () => {
-    if (!currentVoiceNote) return;
-
-    if (!audioPlayer.current) {
-      audioPlayer.current = new Audio(currentVoiceNote);
-      audioPlayer.current.onended = () => setIsPlaying(false);
+    if (!currentVoiceNote || !audioPlayer.current) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Voice note not available for playback.",
+      });
+      return;
     }
 
-    if (isPlaying) {
-      audioPlayer.current.pause();
-    } else {
-      audioPlayer.current.play();
+    try {
+      if (isPlaying) {
+        audioPlayer.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioPlayer.current.play().catch(error => {
+          console.error('Playback error:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to play voice note. Please try again.",
+          });
+          setIsPlaying(false);
+        });
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Playback error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to play voice note. Please try again.",
+      });
+      setIsPlaying(false);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const formatTime = (seconds: number) => {
@@ -82,6 +122,19 @@ export function VoiceNoteRecorder({ onRecordingComplete, currentVoiceNote }: Voi
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (audioPlayer.current) {
+        audioPlayer.current.pause();
+        audioPlayer.current = null;
+      }
+      if (timerInterval.current) {
+        clearInterval(timerInterval.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex items-center gap-2">
