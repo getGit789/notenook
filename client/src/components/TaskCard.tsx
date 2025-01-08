@@ -14,9 +14,9 @@ type TaskCardProps = {
 };
 
 const priorityColors = {
-  low: "bg-[hsl(var(--priority-low-gradient))] text-white/90 shadow-[hsl(var(--priority-low))]",
-  medium: "bg-[hsl(var(--priority-medium-gradient))] text-white/90 shadow-[hsl(var(--priority-medium))]",
-  high: "bg-[hsl(var(--priority-high-gradient))] text-white/90 shadow-[hsl(var(--priority-high))]",
+  low: "bg-[var(--priority-low-bg)] text-white shadow-sm hover:opacity-90",
+  medium: "bg-[var(--priority-medium-bg)] text-black shadow-sm hover:opacity-90",
+  high: "bg-[var(--priority-high-bg)] text-white shadow-sm hover:opacity-90",
 };
 
 const priorityRings = {
