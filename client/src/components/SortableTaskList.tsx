@@ -117,10 +117,6 @@ export function SortableTaskList({ tasks, groupTitle }: SortableTaskListProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      toast({
-        title: "Success",
-        description: "Task order updated",
-      });
     },
     onError: (error) => {
       toast({
