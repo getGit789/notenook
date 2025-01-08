@@ -10,6 +10,22 @@ import { useUser } from "@/hooks/use-user";
 import { SelectTask } from "@db/schema";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const listItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function HomePage() {
   const { user, logout } = useUser();
@@ -40,7 +56,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 space-y-8">
-        <div className="flex justify-between items-center">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center"
+        >
           <div>
             <h1 className="text-3xl font-bold">Task Dashboard</h1>
             <p className="text-muted-foreground">Welcome back, {user?.username}</p>
@@ -52,42 +72,86 @@ export default function HomePage() {
               Logout
             </Button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-8 grid-cols-1 lg:grid-cols-4">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="grid gap-8 grid-cols-1 lg:grid-cols-4"
+        >
           <div className="lg:col-span-3">
             {tasks && <TaskStats tasks={tasks} />}
           </div>
           <div>
             <PomodoroTimer />
           </div>
-        </div>
+        </motion.div>
 
         <TaskFilters filters={filters} onFilterChange={setFilters} />
 
-        <div className="space-y-8">
-          {taskGroups.map((group) => (
-            <div key={group.title}>
-              <h2 className="text-xl font-semibold mb-4">{group.title}</h2>
-              {group.tasks.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {group.tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center text-muted-foreground py-8 bg-card rounded-lg">
-                  No tasks in this group
-                </div>
-              )}
-            </div>
-          ))}
-          {taskGroups.every((group) => group.tasks.length === 0) && (
-            <div className="text-center text-muted-foreground py-8 bg-card rounded-lg">
-              No tasks match the selected filters
-            </div>
-          )}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={filters.groupBy + filters.priority + filters.showCompleted.toString()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="space-y-8"
+          >
+            {taskGroups.map((group) => (
+              <motion.div 
+                key={group.title}
+                variants={container}
+                initial="hidden"
+                animate="show"
+              >
+                <h2 className="text-xl font-semibold mb-4">{group.title}</h2>
+                {group.tasks.length > 0 ? (
+                  <motion.div 
+                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    layout
+                  >
+                    <AnimatePresence mode="popLayout">
+                      {group.tasks.map((task) => (
+                        <motion.div
+                          key={task.id}
+                          variants={listItem}
+                          layout
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ type: "spring", damping: 15 }}
+                        >
+                          <TaskCard task={task} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center text-muted-foreground py-8 bg-card rounded-lg"
+                  >
+                    No tasks in this group
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
+            {taskGroups.every((group) => group.tasks.length === 0) && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center text-muted-foreground py-8 bg-card rounded-lg"
+              >
+                No tasks match the selected filters
+              </motion.div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
