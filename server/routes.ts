@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { db } from "@db";
 import { tasks, insertTaskSchema } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -165,6 +165,37 @@ export function registerRoutes(app: Express): Server {
     }
     next();
   }, express.static('uploads/voice-notes'));
+
+  // Add new route for task reordering
+  app.post("/api/tasks/reorder", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    const { taskIds } = req.body;
+    if (!Array.isArray(taskIds)) {
+      return res.status(400).send("Invalid input: taskIds must be an array");
+    }
+
+    try {
+      // Update task positions using a transaction
+      const updatedTasks = await db.transaction(async (tx) => {
+        const updates = taskIds.map((taskId, index) =>
+          tx
+            .update(tasks)
+            .set({ position: index })
+            .where(eq(tasks.id, taskId))
+            .returning()
+        );
+        return Promise.all(updates);
+      });
+
+      res.json(updatedTasks.flat());
+    } catch (error) {
+      console.error("Error reordering tasks:", error);
+      res.status(500).send("Failed to reorder tasks");
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

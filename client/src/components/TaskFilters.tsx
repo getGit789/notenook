@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SelectTask } from "@db/schema";
 
-type FilterOptions = {
+export type FilterOptions = {
   priority: string | null;
   showCompleted: boolean;
   groupBy: string | null;
@@ -86,7 +86,9 @@ export function filterAndGroupTasks(
   tasks: SelectTask[],
   filters: FilterOptions
 ): { title: string; tasks: SelectTask[] }[] {
-  let filteredTasks = tasks.filter((task) => {
+  let filteredTasks = [...tasks].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
+  filteredTasks = filteredTasks.filter((task) => {
     if (!filters.showCompleted && task.completed) {
       return false;
     }
