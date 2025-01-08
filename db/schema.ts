@@ -15,7 +15,7 @@ export const tasks = pgTable("tasks", {
   priority: text("priority").notNull().default("medium"),
   deadline: timestamp("deadline"),
   completed: boolean("completed").default(false),
-  voiceNote: text("voice_note"),  // URL to the stored voice note
+  voiceNote: text("voice_note"),  // Using snake_case for DB column
   userId: integer("user_id").references(() => users.id).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
