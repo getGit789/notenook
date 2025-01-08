@@ -58,7 +58,9 @@ export default function HomePage() {
         >
           <div>
             <h1 className="text-2xl font-medium mb-1">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Welcome, {user?.username?.split('@')[0]}</p>
+            <p className="text-sm text-muted-foreground">
+              Welcome, {user?.displayName || 'User'}
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
