@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { db } from "@db";
 import { tasks, insertTaskSchema } from "@db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -29,6 +29,25 @@ const upload = multer({ storage: storage });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // Serve voice notes statically with proper headers
+  app.use('/uploads/voice-notes', (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    // Set proper MIME type for audio files
+    res.set({
+      'Accept-Ranges': 'bytes',
+      'Content-Type': 'audio/wav',
+    });
+
+    next();
+  }, express.static(path.join(process.cwd(), 'uploads/voice-notes'), {
+    setHeaders: (res, filePath) => {
+      res.set('Content-Type', 'audio/wav');
+    }
+  }));
+
   app.get("/api/tasks", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
@@ -39,7 +58,13 @@ export function registerRoutes(app: Express): Server {
       orderBy: tasks.createdAt,
     });
 
-    res.json(userTasks);
+    // Transform voice note paths to full URLs
+    const tasksWithFullUrls = userTasks.map(task => ({
+      ...task,
+      voiceNote: task.voiceNote ? `/uploads/voice-notes/${path.basename(task.voiceNote)}` : null
+    }));
+
+    res.json(tasksWithFullUrls);
   });
 
   app.post("/api/tasks", async (req, res) => {
@@ -114,7 +139,6 @@ export function registerRoutes(app: Express): Server {
     res.status(200).send("Task deleted");
   });
 
-  // Voice note upload endpoint
   app.post("/api/tasks/:id/voice-note", upload.single('voiceNote'), async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
@@ -145,28 +169,26 @@ export function registerRoutes(app: Express): Server {
       }
     }
 
+    // Store only the filename in the database
+    const voiceNotePath = path.relative(process.cwd(), req.file.path);
+
     // Update task with new voice note path
     const [updatedTask] = await db
       .update(tasks)
       .set({
-        voiceNote: req.file.path,
+        voiceNote: voiceNotePath,
         updatedAt: new Date()
       })
       .where(eq(tasks.id, taskId))
       .returning();
 
-    res.json(updatedTask);
+    // Return the full URL for the voice note
+    res.json({
+      ...updatedTask,
+      voiceNote: `/uploads/voice-notes/${path.basename(voiceNotePath)}`
+    });
   });
 
-  // Serve voice notes statically
-  app.use('/uploads/voice-notes', (req, res, next) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).send("Not authenticated");
-    }
-    next();
-  }, express.static('uploads/voice-notes'));
-
-  // Add new route for task reordering
   app.post("/api/tasks/reorder", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
