@@ -29,6 +29,17 @@ const upload = multer({ storage: storage });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // CORS middleware for voice note routes
+  app.use('/uploads/voice-notes', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
   app.get("/api/tasks", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
@@ -50,7 +61,7 @@ export function registerRoutes(app: Express): Server {
     const taskData = {
       ...req.body,
       userId: req.user.id,
-      voiceNote: req.file?.path,
+      voiceNote: req.file ? `/uploads/voice-notes/${path.basename(req.file.path)}` : undefined,
     };
 
     const result = insertTaskSchema.safeParse(taskData);
@@ -159,7 +170,7 @@ export function registerRoutes(app: Express): Server {
     const [updatedTask] = await db
       .update(tasks)
       .set({
-        voiceNote: req.file.path,
+        voiceNote: `/uploads/voice-notes/${path.basename(req.file.path)}`,
         updatedAt: new Date()
       })
       .where(eq(tasks.id, taskId))
@@ -168,7 +179,7 @@ export function registerRoutes(app: Express): Server {
     res.json(updatedTask);
   });
 
-  // Serve voice notes statically
+  // Serve voice notes statically with proper headers
   app.use('/uploads/voice-notes', (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
