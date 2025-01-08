@@ -14,9 +14,9 @@ type TaskCardProps = {
 };
 
 const priorityColors = {
-  low: "bg-[hsl(var(--priority-low-gradient))] shadow-[hsl(var(--priority-low))]",
-  medium: "bg-[hsl(var(--priority-medium-gradient))] shadow-[hsl(var(--priority-medium))]",
-  high: "bg-[hsl(var(--priority-high-gradient))] shadow-[hsl(var(--priority-high))]",
+  low: "bg-[hsl(var(--priority-low-gradient))] text-white/90 shadow-[hsl(var(--priority-low))]",
+  medium: "bg-[hsl(var(--priority-medium-gradient))] text-white/90 shadow-[hsl(var(--priority-medium))]",
+  high: "bg-[hsl(var(--priority-high-gradient))] text-white/90 shadow-[hsl(var(--priority-high))]",
 };
 
 const priorityRings = {
@@ -124,7 +124,7 @@ export function TaskCard({ task }: TaskCardProps) {
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
-      <Card 
+      <Card
         className={`
           ${task.completed ? "opacity-60" : ""} 
           ring-1 ring-inset ${priorityRings[task.priority as keyof typeof priorityRings]} 
@@ -162,13 +162,13 @@ export function TaskCard({ task }: TaskCardProps) {
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
             >
-              <Badge 
+              <Badge
                 className={`
                   ${priorityColors[task.priority as keyof typeof priorityColors]} 
-                  shadow-sm font-semibold
+                  shadow-sm font-semibold px-3 py-1
                 `}
               >
-                {task.priority}
+                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
               </Badge>
             </motion.div>
             <motion.div
@@ -205,7 +205,7 @@ export function TaskCard({ task }: TaskCardProps) {
             </motion.p>
           )}
           <div className="mt-4">
-            <VoiceNoteRecorder 
+            <VoiceNoteRecorder
               onRecordingComplete={handleVoiceNoteComplete}
               currentVoiceNote={task.voiceNote}
             />
