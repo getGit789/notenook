@@ -6,7 +6,7 @@ import { SelectTask } from "@db/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { VoiceNoteRecorder } from "./VoiceNoteRecorder";
 
 type TaskCardProps = {
@@ -14,15 +14,9 @@ type TaskCardProps = {
 };
 
 const priorityColors = {
-  low: "bg-[var(--priority-low-bg)] text-white shadow-sm hover:opacity-90",
-  medium: "bg-[var(--priority-medium-bg)] text-black shadow-sm hover:opacity-90",
-  high: "bg-[var(--priority-high-bg)] text-white shadow-sm hover:opacity-90",
-};
-
-const priorityRings = {
-  low: "ring-[hsl(var(--priority-low))]",
-  medium: "ring-[hsl(var(--priority-medium))]",
-  high: "ring-[hsl(var(--priority-high))]",
+  low: "priority-low",
+  medium: "priority-medium",
+  high: "priority-high",
 };
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -100,9 +94,7 @@ export function TaskCard({ task }: TaskCardProps) {
         throw new Error(await response.text());
       }
 
-      const updatedTask = await response.json();
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-
       toast({
         title: "Success",
         description: "Voice note added successfully",
@@ -124,85 +116,43 @@ export function TaskCard({ task }: TaskCardProps) {
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
     >
-      <Card
-        className={`
-          ${task.completed ? "opacity-60" : ""} 
-          ring-1 ring-inset ${priorityRings[task.priority as keyof typeof priorityRings]} 
-          transition-shadow duration-200 hover:ring-2
-          ${task.priority === 'high' ? 'animate-pulse' : ''}
-        `}
-      >
+      <Card className={`${task.completed ? "opacity-60" : ""}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             <div className="flex items-center gap-2">
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Checkbox
-                  checked={task.completed || false}
-                  onCheckedChange={(checked) =>
-                    updateTask.mutate({ completed: checked === true })
-                  }
-                />
-              </motion.div>
-              <motion.span
-                animate={{
-                  textDecoration: task.completed ? "line-through" : "none",
-                  opacity: task.completed ? 0.6 : 1,
-                }}
-                transition={{ duration: 0.2 }}
-              >
+              <Checkbox
+                checked={task.completed || false}
+                onCheckedChange={(checked) =>
+                  updateTask.mutate({ completed: checked === true })
+                }
+              />
+              <span className={task.completed ? "line-through opacity-60" : ""}>
                 {task.title}
-              </motion.span>
+              </span>
             </div>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
+            <Badge className={`${priorityColors[task.priority as keyof typeof priorityColors]} px-3 py-1`}>
+              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => deleteTask.mutate()}
+              className="h-8 w-8"
             >
-              <Badge
-                className={`
-                  ${priorityColors[task.priority as keyof typeof priorityColors]} 
-                  shadow-sm font-semibold px-3 py-1
-                `}
-              >
-                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-              </Badge>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteTask.mutate()}
-                className="h-8 w-8"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </motion.div>
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <motion.p
-            initial={false}
-            animate={{ opacity: task.completed ? 0.6 : 1 }}
-            className="text-sm text-muted-foreground"
-          >
+          <p className={`text-sm text-muted-foreground ${task.completed ? "opacity-60" : ""}`}>
             {task.description}
-          </motion.p>
+          </p>
           {task.deadline && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-muted-foreground mt-2"
-            >
+            <p className="text-xs text-muted-foreground mt-2">
               Due: {new Date(task.deadline).toLocaleDateString()}
-            </motion.p>
+            </p>
           )}
           <div className="mt-4">
             <VoiceNoteRecorder
