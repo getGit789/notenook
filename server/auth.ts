@@ -57,7 +57,6 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Local Strategy (using email instead of username)
   passport.use(
     new LocalStrategy(
       {
@@ -181,26 +180,6 @@ export function setupAuth(app: Express) {
     passport.authenticate("local", cb)(req, res, next);
   });
 
-  // Add endpoint to update display name
-  app.put("/api/user/display-name", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).send("Not authenticated");
-    }
-
-    const { displayName } = req.body;
-    if (!displayName || typeof displayName !== 'string' || displayName.length < 1) {
-      return res.status(400).send("Invalid display name");
-    }
-
-    const [updatedUser] = await db
-      .update(users)
-      .set({ displayName })
-      .where(eq(users.id, req.user.id))
-      .returning();
-
-    res.json(updatedUser);
-  });
-
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
       if (err) {
@@ -216,92 +195,4 @@ export function setupAuth(app: Express) {
     }
     res.status(401).send("Not logged in");
   });
-  // Google Strategy (placeholder configuration)
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    passport.use(
-      new GoogleStrategy(
-        {
-          clientID: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callbackURL: "/api/auth/google/callback",
-        },
-        async (accessToken, refreshToken, profile, done) => {
-          try {
-            let [user] = await db
-              .select()
-              .from(users)
-              .where(eq(users.username, profile.emails![0].value))
-              .limit(1);
-
-            if (!user) {
-              const [newUser] = await db
-                .insert(users)
-                .values({
-                  username: profile.emails![0].value,
-                  password: await crypto.hash(randomBytes(32).toString("hex")),
-                })
-                .returning();
-              user = newUser;
-            }
-
-            return done(null, user);
-          } catch (err) {
-            return done(err as Error);
-          }
-        }
-      )
-    );
-  }
-
-  // GitHub Strategy (placeholder configuration)
-  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
-    passport.use(
-      new GitHubStrategy(
-        {
-          clientID: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          callbackURL: "/api/auth/github/callback",
-        },
-        async (accessToken, refreshToken, profile, done) => {
-          try {
-            let [user] = await db
-              .select()
-              .from(users)
-              .where(eq(users.username, profile.username!))
-              .limit(1);
-
-            if (!user) {
-              const [newUser] = await db
-                .insert(users)
-                .values({
-                  username: profile.username!,
-                  password: await crypto.hash(randomBytes(32).toString("hex")),
-                })
-                .returning();
-              user = newUser;
-            }
-
-            return done(null, user);
-          } catch (err) {
-            return done(err as Error);
-          }
-        }
-      )
-    );
-  }
-  // OAuth routes
-  app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-  app.get("/api/auth/github", passport.authenticate("github"));
-
-  app.get(
-    "/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/" }),
-    (req, res) => res.redirect("/")
-  );
-
-  app.get(
-    "/api/auth/github/callback",
-    passport.authenticate("github", { failureRedirect: "/" }),
-    (req, res) => res.redirect("/")
-  );
 }

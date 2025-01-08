@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -33,7 +34,16 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
   }),
 }));
 
-export const insertUserSchema = createInsertSchema(users);
+const emailSchema = z.string().email("Invalid email address");
+const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
+const displayNameSchema = z.string().min(1, "Display name is required").optional();
+
+export const insertUserSchema = createInsertSchema(users, {
+  email: emailSchema,
+  password: passwordSchema,
+  displayName: displayNameSchema,
+});
+
 export const selectUserSchema = createSelectSchema(users);
 export const insertTaskSchema = createInsertSchema(tasks);
 export const selectTaskSchema = createSelectSchema(tasks);
