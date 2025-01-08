@@ -21,12 +21,16 @@ import { TaskCard } from "./TaskCard";
 import { SelectTask } from "@db/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type SortableTaskListProps = {
   tasks: SelectTask[];
   groupTitle: string;
+};
+
+type SortableTaskItemProps = {
+  task: SelectTask;
 };
 
 const dropAnimation = {
@@ -39,7 +43,7 @@ const dropAnimation = {
   }),
 };
 
-function SortableTaskItem({ task }: { task: SelectTask }) {
+const SortableTaskItem = forwardRef<HTMLDivElement, SortableTaskItemProps>(({ task }, ref) => {
   const {
     attributes,
     listeners,
@@ -71,7 +75,15 @@ function SortableTaskItem({ task }: { task: SelectTask }) {
         opacity: { duration: 0.2 },
         scale: { duration: 0.2 }
       }}
-      ref={setNodeRef}
+      ref={(node) => {
+        // Merge the refs
+        setNodeRef(node);
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }}
       style={style}
       {...attributes}
       {...listeners}
@@ -79,7 +91,9 @@ function SortableTaskItem({ task }: { task: SelectTask }) {
       <TaskCard task={task} />
     </motion.div>
   );
-}
+});
+
+SortableTaskItem.displayName = 'SortableTaskItem';
 
 export function SortableTaskList({ tasks, groupTitle }: SortableTaskListProps) {
   const [activeId, setActiveId] = useState<number | null>(null);

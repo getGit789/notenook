@@ -1,0 +1,28 @@
+Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?%s%s 
+
+Check the render method of `PopChild`. 
+    at SortableTaskItem (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/src/components/SortableTaskList.tsx:49:29)
+    at PopChildMeasure (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7683:23)
+    at PopChild (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7704:21)
+    at PresenceChild (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7742:24)
+    at AnimatePresence (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7800:26)
+    at div
+    at MotionComponent (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:6536:40)
+    at SortableContext (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/@dnd-kit_sortable.js?v=5d122a18:261:5)
+    at DndContext2 (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/chunk-62BWR6Y6.js?v=5d122a18:2521:5)
+    at div
+    at MotionComponent (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:6536:40)
+    at SortableTaskList (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/src/components/SortableTaskList.tsx:103:36)
+    at div
+    at MotionComponent (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:6536:40)
+    at div
+    at MotionComponent (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:6536:40)
+    at PresenceChild (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7742:24)
+    at AnimatePresence (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/framer-motion.js?v=5d122a18:7800:26)
+    at div
+    at div
+    at HomePage (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/src/pages/HomePage.tsx:41:28)
+    at Route (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/wouter.js?v=5d122a18:323:16)
+    at Switch (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/wouter.js?v=5d122a18:379:17)
+    at App (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/src/App.tsx:25:31)
+    at QueryClientProvider (https://b0e0d5df-3287-4196-b975-036d9fdb8c9e-00-1p6255u31fwic.picard.replit.dev/@fs/home/runner/TaskMasterPro/node_modules/.vite/deps/@tanstack_react-query.js?v=5d122a18:2805:3)
