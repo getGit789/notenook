@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -29,8 +30,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { InsertTask } from "@db/schema";
 import { VoiceNoteRecorder } from "./VoiceNoteRecorder";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-type FormData = Omit<InsertTask, "id" | "userId" | "createdAt" | "updatedAt">;
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  priority: z.enum(["low", "medium", "high"]),
+  completed: z.boolean().default(false),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 export function CreateTaskDialog() {
   const [open, setOpen] = useState(false);
@@ -39,6 +49,7 @@ export function CreateTaskDialog() {
   const queryClient = useQueryClient();
 
   const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -100,9 +111,12 @@ export function CreateTaskDialog() {
       <DialogTrigger asChild>
         <Button>Create New Task</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent aria-describedby="task-dialog-description">
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
+          <DialogDescription id="task-dialog-description">
+            Add a new task to your list. You can include a title, description, priority level, and even record a voice note.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -129,6 +143,7 @@ export function CreateTaskDialog() {
                     <Textarea
                       placeholder="Enter task description"
                       {...field}
+                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
