@@ -29,17 +29,6 @@ const upload = multer({ storage: storage });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
-  // CORS middleware for voice note routes
-  app.use('/uploads/voice-notes', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-
   app.get("/api/tasks", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
@@ -53,23 +42,13 @@ export function registerRoutes(app: Express): Server {
     res.json(userTasks);
   });
 
-  app.post("/api/tasks", upload.single('voiceNote'), async (req, res) => {
+  app.post("/api/tasks", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
     }
 
-    const taskData = {
-      ...req.body,
-      userId: req.user.id,
-      voiceNote: req.file ? `/uploads/voice-notes/${path.basename(req.file.path)}` : undefined,
-    };
-
-    const result = insertTaskSchema.safeParse(taskData);
+    const result = insertTaskSchema.safeParse({ ...req.body, userId: req.user.id });
     if (!result.success) {
-      // Clean up uploaded file if validation fails
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(400).send("Invalid input");
     }
 
@@ -170,7 +149,7 @@ export function registerRoutes(app: Express): Server {
     const [updatedTask] = await db
       .update(tasks)
       .set({
-        voiceNote: `/uploads/voice-notes/${path.basename(req.file.path)}`,
+        voiceNote: req.file.path,
         updatedAt: new Date()
       })
       .where(eq(tasks.id, taskId))
@@ -179,7 +158,7 @@ export function registerRoutes(app: Express): Server {
     res.json(updatedTask);
   });
 
-  // Serve voice notes statically with proper headers
+  // Serve voice notes statically
   app.use('/uploads/voice-notes', (req, res, next) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");

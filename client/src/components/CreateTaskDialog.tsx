@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -29,27 +28,15 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { InsertTask } from "@db/schema";
-import { VoiceNoteRecorder } from "./VoiceNoteRecorder";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  priority: z.enum(["low", "medium", "high"]),
-  completed: z.boolean().default(false),
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = Omit<InsertTask, "id" | "userId" | "createdAt" | "updatedAt">;
 
 export function CreateTaskDialog() {
   const [open, setOpen] = useState(false);
-  const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -60,20 +47,12 @@ export function CreateTaskDialog() {
 
   const createTask = useMutation({
     mutationFn: async (data: FormData) => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      if (voiceNoteBlob) {
-        formData.append('voiceNote', voiceNoteBlob, 'voice-note.wav');
-      }
-
       const response = await fetch("/api/tasks", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
         credentials: "include",
       });
 
@@ -87,7 +66,6 @@ export function CreateTaskDialog() {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       setOpen(false);
       form.reset();
-      setVoiceNoteBlob(null);
       toast({
         title: "Success",
         description: "Task created successfully",
@@ -111,12 +89,9 @@ export function CreateTaskDialog() {
       <DialogTrigger asChild>
         <Button>Create New Task</Button>
       </DialogTrigger>
-      <DialogContent aria-describedby="task-dialog-description">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
-          <DialogDescription id="task-dialog-description">
-            Add a new task to your list. You can include a title, description, priority level, and even record a voice note.
-          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -143,7 +118,6 @@ export function CreateTaskDialog() {
                     <Textarea
                       placeholder="Enter task description"
                       {...field}
-                      value={field.value || ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -175,12 +149,6 @@ export function CreateTaskDialog() {
                 </FormItem>
               )}
             />
-            <div className="space-y-2">
-              <FormLabel>Voice Note</FormLabel>
-              <VoiceNoteRecorder
-                onRecordingComplete={(blob) => setVoiceNoteBlob(blob)}
-              />
-            </div>
             <Button type="submit" disabled={createTask.isPending}>
               Create Task
             </Button>
