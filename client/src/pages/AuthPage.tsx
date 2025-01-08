@@ -7,10 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { SiGoogle, SiGithub } from "react-icons/si";
-import { Separator } from "@/components/ui/separator";
 
 type FormData = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -21,7 +20,7 @@ export default function AuthPage() {
 
   const form = useForm<FormData>({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -98,12 +97,12 @@ export default function AuthPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter username" {...field} />
+                        <Input placeholder="Enter email address" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
