@@ -140,7 +140,7 @@ export function TaskCard({ task }: TaskCardProps) {
                 transition={{ duration: 0.2 }}
               >
                 <Checkbox
-                  checked={task.completed}
+                  checked={task.completed || false}
                   onCheckedChange={(checked) =>
                     updateTask.mutate({ completed: checked === true })
                   }
@@ -207,7 +207,7 @@ export function TaskCard({ task }: TaskCardProps) {
           <div className="mt-4">
             <VoiceNoteRecorder
               onRecordingComplete={handleVoiceNoteComplete}
-              currentVoiceNote={task.voiceNote}
+              currentVoiceNote={task.voiceNote || undefined}
             />
           </div>
         </CardContent>
