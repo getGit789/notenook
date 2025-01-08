@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { VoiceNoteRecorder } from "./VoiceNoteRecorder";
 
 type TaskCardProps = {
   task: SelectTask;
@@ -79,35 +78,6 @@ export function TaskCard({ task }: TaskCardProps) {
     },
   });
 
-  const handleVoiceNoteComplete = async (audioBlob: Blob) => {
-    const formData = new FormData();
-    formData.append('voiceNote', audioBlob, 'voice-note.wav');
-
-    try {
-      const response = await fetch(`/api/tasks/${task.id}/voice-note`, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
-      toast({
-        title: "Success",
-        description: "Voice note added successfully",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to upload voice note",
-      });
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -154,12 +124,6 @@ export function TaskCard({ task }: TaskCardProps) {
               Due: {new Date(task.deadline).toLocaleDateString()}
             </p>
           )}
-          <div className="mt-4">
-            <VoiceNoteRecorder
-              onRecordingComplete={handleVoiceNoteComplete}
-              currentVoiceNote={task.voiceNote || undefined}
-            />
-          </div>
         </CardContent>
       </Card>
     </motion.div>
