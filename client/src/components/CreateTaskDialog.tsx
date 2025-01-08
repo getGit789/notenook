@@ -28,11 +28,13 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { InsertTask } from "@db/schema";
+import { VoiceNoteRecorder } from "./VoiceNoteRecorder";
 
 type FormData = Omit<InsertTask, "id" | "userId" | "createdAt" | "updatedAt">;
 
 export function CreateTaskDialog() {
   const [open, setOpen] = useState(false);
+  const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -47,12 +49,20 @@ export function CreateTaskDialog() {
 
   const createTask = useMutation({
     mutationFn: async (data: FormData) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      if (voiceNoteBlob) {
+        formData.append('voiceNote', voiceNoteBlob, 'voice-note.wav');
+      }
+
       const response = await fetch("/api/tasks", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData,
         credentials: "include",
       });
 
@@ -66,6 +76,7 @@ export function CreateTaskDialog() {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       setOpen(false);
       form.reset();
+      setVoiceNoteBlob(null);
       toast({
         title: "Success",
         description: "Task created successfully",
@@ -149,6 +160,12 @@ export function CreateTaskDialog() {
                 </FormItem>
               )}
             />
+            <div className="space-y-2">
+              <FormLabel>Voice Note</FormLabel>
+              <VoiceNoteRecorder
+                onRecordingComplete={(blob) => setVoiceNoteBlob(blob)}
+              />
+            </div>
             <Button type="submit" disabled={createTask.isPending}>
               Create Task
             </Button>

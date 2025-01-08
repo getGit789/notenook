@@ -42,13 +42,23 @@ export function registerRoutes(app: Express): Server {
     res.json(userTasks);
   });
 
-  app.post("/api/tasks", async (req, res) => {
+  app.post("/api/tasks", upload.single('voiceNote'), async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
     }
 
-    const result = insertTaskSchema.safeParse({ ...req.body, userId: req.user.id });
+    const taskData = {
+      ...req.body,
+      userId: req.user.id,
+      voiceNote: req.file?.path,
+    };
+
+    const result = insertTaskSchema.safeParse(taskData);
     if (!result.success) {
+      // Clean up uploaded file if validation fails
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(400).send("Invalid input");
     }
 
