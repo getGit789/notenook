@@ -14,15 +14,15 @@ type TaskCardProps = {
 };
 
 const priorityColors = {
-  low: "bg-gradient-to-r from-green-400 to-green-500 text-white",
-  medium: "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white",
-  high: "bg-gradient-to-r from-red-400 to-red-500 text-white",
+  low: "bg-[hsl(var(--priority-low-gradient))] shadow-[hsl(var(--priority-low))]",
+  medium: "bg-[hsl(var(--priority-medium-gradient))] shadow-[hsl(var(--priority-medium))]",
+  high: "bg-[hsl(var(--priority-high-gradient))] shadow-[hsl(var(--priority-high))]",
 };
 
 const priorityRings = {
-  low: "ring-green-400/30",
-  medium: "ring-yellow-400/30",
-  high: "ring-red-400/30",
+  low: "ring-[hsl(var(--priority-low))]",
+  medium: "ring-[hsl(var(--priority-medium))]",
+  high: "ring-[hsl(var(--priority-high))]",
 };
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -125,7 +125,12 @@ export function TaskCard({ task }: TaskCardProps) {
       transition={{ duration: 0.2 }}
     >
       <Card 
-        className={`${task.completed ? "opacity-60" : ""} ring-1 ring-inset ${priorityRings[task.priority as keyof typeof priorityRings]} transition-shadow duration-200`}
+        className={`
+          ${task.completed ? "opacity-60" : ""} 
+          ring-1 ring-inset ${priorityRings[task.priority as keyof typeof priorityRings]} 
+          transition-shadow duration-200 hover:ring-2
+          ${task.priority === 'high' ? 'animate-pulse' : ''}
+        `}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
@@ -157,7 +162,12 @@ export function TaskCard({ task }: TaskCardProps) {
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
             >
-              <Badge className={`${priorityColors[task.priority as keyof typeof priorityColors]} shadow-sm`}>
+              <Badge 
+                className={`
+                  ${priorityColors[task.priority as keyof typeof priorityColors]} 
+                  shadow-sm font-semibold
+                `}
+              >
                 {task.priority}
               </Badge>
             </motion.div>

@@ -12,16 +12,36 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+
+    /* Priority Colors - Light Theme */
+    --priority-high: 0 84% 60%;      /* Vibrant red */
+    --priority-medium: 38 92% 50%;    /* Warm amber */
+    --priority-low: 142 70% 45%;      /* Soft green */
+
+    /* Priority Gradients - Light Theme */
+    --priority-high-gradient: linear-gradient(135deg, hsl(0 84% 65%) 0%, hsl(0 84% 55%) 100%);
+    --priority-medium-gradient: linear-gradient(135deg, hsl(38 92% 55%) 0%, hsl(38 92% 45%) 100%);
+    --priority-low-gradient: linear-gradient(135deg, hsl(142 70% 50%) 0%, hsl(142 70% 40%) 100%);
   }
 
   .dark {
-    --background: 0 0% 13%; /* #212121 */
+    --background: 0 0% 13%;
     --foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+
+    /* Priority Colors - Dark Theme */
+    --priority-high: 0 84% 65%;       /* Brighter red for dark mode */
+    --priority-medium: 38 92% 55%;    /* Brighter amber for dark mode */
+    --priority-low: 142 70% 50%;      /* Brighter green for dark mode */
+
+    /* Priority Gradients - Dark Theme */
+    --priority-high-gradient: linear-gradient(135deg, hsl(0 84% 70%) 0%, hsl(0 84% 60%) 100%);
+    --priority-medium-gradient: linear-gradient(135deg, hsl(38 92% 60%) 0%, hsl(38 92% 50%) 100%);
+    --priority-low-gradient: linear-gradient(135deg, hsl(142 70% 55%) 0%, hsl(142 70% 45%) 100%);
   }
 
   * {
