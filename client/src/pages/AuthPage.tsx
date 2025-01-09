@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { SiGoogle, SiGithub } from "react-icons/si";
+import { SiGithub } from "react-icons/si";
+import { FcGoogle } from "react-icons/fc";
 
 type FormData = {
   email: string;
@@ -54,7 +55,11 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold text-primary mb-2">NoteNook</h1>
+        <p className="text-muted-foreground">Your Personal Note-Taking Sanctuary</p>
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -66,19 +71,19 @@ export default function AuthPage() {
             <div className="grid gap-2">
               <Button
                 variant="outline"
-                onClick={() => window.location.href = "/api/auth/google"}
-                className="w-full flex items-center justify-center gap-2"
+                onClick={() => window.location.href = "/auth/google"}
+                className="w-full h-10 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-600 border border-gray-300 shadow-sm"
               >
-                <SiGoogle className="h-4 w-4" />
-                Continue with Google
+                <FcGoogle className="h-5 w-5" />
+                <span className="text-gray-800 font-medium">Sign in with Google</span>
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = "/api/auth/github"}
-                className="w-full flex items-center justify-center gap-2"
+                onClick={() => window.location.href = "/auth/github"}
+                className="w-full h-10 flex items-center justify-center gap-2 bg-[#24292e] hover:bg-[#2f363d] text-white border-[#1b1f23]"
               >
-                <SiGithub className="h-4 w-4" />
-                Continue with GitHub
+                <SiGithub className="h-5 w-5" />
+                <span className="font-medium">Sign in with GitHub</span>
               </Button>
             </div>
 

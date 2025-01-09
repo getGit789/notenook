@@ -7,7 +7,11 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").unique().notNull(),
   displayName: text("display_name"),
-  password: text("password").notNull(),
+  password: text("password"),
+  googleId: text("google_id").unique(),
+  githubId: text("github_id").unique(),
+  avatar: text("avatar_url"),
+  provider: text("provider"),
 });
 
 export const tasks = pgTable("tasks", {
